@@ -68,11 +68,11 @@ def ReduceGapFromPageTop(wch_section='main page'):
         st.markdown(" <style> div[class^='st-emotion-cache-10oheav'] { padding-top: 0rem; } </style> ", True)  # sidebar
 
 """
-El procedimiento Leaderboard toma un parametro what_to_do que indica si se debe create, write o read la tabla de clasificacion.
-Si el parametro indica create: Crea una tabla de clasificacion y lo guarda en un archivo leaderboard.json.
-Si el parametro indica write: El codigo verifica si hay un nombre de jugador proporcionado, si es asi, carga la tabla de clasificacion existente y 
+El procedimiento Leaderboard toma un parametro what_to_do que indica si se debe create, write o read la tabla.
+Si el parametro indica create: Crea una tabla y lo guarda en un archivo leaderboard.json.
+Si el parametro indica write: El codigo verifica si hay un nombre de jugador proporcionado, si es asi, carga la tabla existente y 
 agrega la nueva puntuacion del jugador y ordena la tabla
-Si el parametro indica read: El codigo carga la tabla de clasificacion existente y la ordena
+Si el parametro indica read: El codigo carga la tabla existente y la ordena
 """
 def Leaderboard(what_to_do):
     if what_to_do == 'create':
@@ -167,7 +167,11 @@ def ReadPictureFile(wch_fl):
     except:
         return ""
 
-# El procedimiento PressedCheck representa el flujo del juego y se encarga de manejar las interacciones del jugador con los botones del juego
+"""
+El procedimiento PressedCheck representa el flujo del juego es decir se encarga 
+de verificar si la imagen que ha seleccionado el usuario es correcta si es asi se le incrementa la puntuacion del jugador 
+dependiendo de la dificultad del juego.
+"""
 def PressedCheck(vcell):
     if mystate.plyrbtns[vcell]['isPressed'] == False:
         mystate.plyrbtns[vcell]['isPressed'] = True

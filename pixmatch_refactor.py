@@ -10,8 +10,6 @@ from streamlit_autorefresh import st_autorefresh
 st.set_page_config(page_title="PixMatch", page_icon="🕹️", layout="wide", initial_sidebar_state="expanded")
 
 vDrive = os.path.splitdrive(os.getcwd())[0]
-# if vDrive == "C:": vpth = "C:/Users/Shawn/dev/utils/pixmatch/"   # local developer's disc
-# else:
 vpth = "./"
 
 sbe = """<span style='font-size: 140px;
@@ -54,7 +52,7 @@ if "plyrbtns" not in mystate: mystate.plyrbtns = {}
 if "sidebar_emoji" not in mystate: mystate.sidebar_emoji = ''
 if "emoji_bank" not in mystate: mystate.emoji_bank = []
 if "GameDetails" not in mystate: mystate.GameDetails = ['Medium', 6, 7, '']  # difficulty level, sec interval for autogen, total_cells_per_row_or_col, player name
-
+if "failures" not in mystate: mystate.failures = 0 #Modificacion 1
 
 # common functions
 def ReduceGapFromPageTop(wch_section='main page'):
@@ -86,11 +84,13 @@ def Leaderboard(what_to_do):
                 leaderboard = json.load(open(vpth + 'leaderboard.json'))  # read file
                 leaderboard_dict_lngth = len(leaderboard)
 
-                leaderboard[str(leaderboard_dict_lngth + 1)] = {'NameCountry': mystate.GameDetails[3], 'HighestScore': mystate.myscore}
+                leaderboard[mystate.GameDetails[3]] = {'NameCountry': mystate.GameDetails[3], 'HighestScore': mystate.myscore}
                 leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1]['HighestScore'], reverse=True))  # sort desc
 
-                if len(leaderboard) > 3:
-                    for i in range(len(leaderboard) - 3): leaderboard.popitem()  # rmv last kdict ey
+                #Modificacion 2
+                if len(leaderboard) > 4:
+                    for i in range(len(leaderboard) - 4):
+                        leaderboard.popitem()  # rmv last kdict ey
 
                 json.dump(leaderboard, open(vpth + 'leaderboard.json', 'w'))  # write file
 
@@ -115,7 +115,9 @@ def Leaderboard(what_to_do):
                         elif rknt == 3:
                             sc3.write(
                                 f"🥈 | {leaderboard[vkey]['NameCountry']}: :red[{leaderboard[vkey]['HighestScore']}]")
-
+                        elif rknt == 4:  # Modificacion 3
+                            sc3.write(
+                                f"🥉 | {leaderboard[vkey]['NameCountry']}: :red[{leaderboard[vkey]['HighestScore']}]")
 
 # El procedimiento InitialPage establece la interfaz de usuario inicial para el juego
 def InitialPage():
@@ -123,7 +125,7 @@ def InitialPage():
         st.subheader("🖼️ Pix Match:")
         st.markdown(horizontal_bar, True)
 
-        # sidebarlogo = Image.open('sidebarlogo.jpg').resize((300, 420))
+        #sidebarlogo = Image.open('sidebarlogo.jpg').resize((300, 420))
         sidebarlogo = Image.open('sidebarlogo.jpg').resize((300, 390))
         st.image(sidebarlogo, use_column_width='auto')
 
@@ -186,11 +188,11 @@ def PressedCheck(vcell):
         else:
             mystate.plyrbtns[vcell]['isTrueFalse'] = False
             mystate.myscore -= 1
+            mystate.failures += 1 #Modificacion 4
 
 # El procedimiento ResetBoard se encarga de restablecer el tablero del juego
 def ResetBoard():
     total_cells_per_row_or_col = mystate.GameDetails[2]
-
     sidebar_emoji_no = random.randint(1, len(mystate.emoji_bank)) - 1
     mystate.sidebar_emoji = mystate.emoji_bank[sidebar_emoji_no]
 
@@ -200,7 +202,8 @@ def ResetBoard():
         if mystate.plyrbtns[vcell]['isPressed'] == False:
             vemoji = mystate.emoji_bank[rndm_no]
             mystate.plyrbtns[vcell]['eMoji'] = vemoji
-            if vemoji == mystate.sidebar_emoji: sidebar_emoji_in_list = True
+            if vemoji == mystate.sidebar_emoji:
+                sidebar_emoji_in_list = True
 
     if sidebar_emoji_in_list == False:  # sidebar pix is not on any button; add pix randomly
         tlst = [x for x in range(1, ((total_cells_per_row_or_col ** 2) + 1))]
@@ -218,6 +221,7 @@ def PreNewGame():
     total_cells_per_row_or_col = mystate.GameDetails[2]
     mystate.expired_cells = []
     mystate.myscore = 0
+    mystate.failures = 0 #Modificacion 4
 
     foxes = ['😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾']
     emojis = ['😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛',
@@ -262,8 +266,7 @@ def PreNewGame():
         mystate.emoji_bank = locals()[wch_bank]
 
     elif mystate.GameDetails[0] == 'Medium':
-        wch_bank = random.choice(
-            ['foxes', 'emojis', 'humans', 'vehicles', 'houses', 'hands', 'purple_signs', 'red_signs', 'blue_signs'])
+        wch_bank = random.choice(['foxes', 'emojis', 'humans', 'vehicles', 'houses', 'hands', 'purple_signs', 'red_signs', 'blue_signs'])
         mystate.emoji_bank = locals()[wch_bank]
 
     elif mystate.GameDetails[0] == 'Hard':
@@ -273,9 +276,8 @@ def PreNewGame():
         mystate.emoji_bank = locals()[wch_bank]
 
     mystate.plyrbtns = {}
-    for vcell in range(1, ((total_cells_per_row_or_col ** 2) + 1)): mystate.plyrbtns[vcell] = {'isPressed': False,
-                                                                                               'isTrueFalse': False,
-                                                                                               'eMoji': ''}
+    for vcell in range(1, ((total_cells_per_row_or_col ** 2) + 1)):
+        mystate.plyrbtns[vcell] = {'isPressed': False, 'isTrueFalse': False, 'eMoji': ''}
 
 # La funcion ScoreEmoji retorna un emoji que representa el estado actual de la puntuacion del jugador
 def ScoreEmoji():
@@ -307,10 +309,10 @@ def NewGame():
         st.markdown(sbe.replace('|fill_variable|', mystate.sidebar_emoji), True)
 
         aftimer = st_autorefresh(interval=(mystate.GameDetails[1] * 1000), key="aftmr")
-        if aftimer > 0: mystate.myscore -= 1
+        if aftimer > 0:
+            mystate.myscore -= 1
 
-        st.info(
-            f"{ScoreEmoji()} Score: {mystate.myscore} | Pending: {(total_cells_per_row_or_col ** 2) - len(mystate.expired_cells)}")
+        st.info(f"{ScoreEmoji()} Score: {mystate.myscore} | Pending: {(total_cells_per_row_or_col ** 2) - len(mystate.expired_cells)}")
 
         st.markdown(horizontal_bar, True)
         if st.button(f"🔙 Return to Main Page", use_container_width=True):
@@ -322,8 +324,7 @@ def NewGame():
     st.markdown(horizontal_bar, True)
 
     # Set Board Dafaults
-    st.markdown("<style> div[class^='css-1vbkxwb'] > p { font-size: 1.5rem; } </style> ",
-                unsafe_allow_html=True)  # make button face big
+    st.markdown("<style> div[class^='css-1vbkxwb'] > p { font-size: 1.5rem; } </style> ", unsafe_allow_html=True)  # make button face big
 
     for i in range(1, (total_cells_per_row_or_col + 1)):
         tlst = ([1] * total_cells_per_row_or_col) + [2]  # 2 = rt side padding
@@ -380,39 +381,36 @@ def NewGame():
 
         else:
             vemoji = mystate.plyrbtns[vcell]['eMoji']
-            globals()['cols' + arr_ref][vcell - mval].button(vemoji, on_click=PressedCheck, args=(vcell,),
-                                                             key=f"B{vcell}")
+            globals()['cols' + arr_ref][vcell - mval].button(vemoji, on_click=PressedCheck, args=(vcell,), key=f"B{vcell}")
 
     st.caption('')  # vertical filler
     st.markdown(horizontal_bar, True)
 
-    if len(mystate.expired_cells) == (total_cells_per_row_or_col ** 2):
+    #Modificacion 5
+    if len(mystate.expired_cells) == (total_cells_per_row_or_col ** 2) or mystate.failures > (total_cells_per_row_or_col ** 2) / 2:
         Leaderboard('write')
 
         if mystate.myscore > 0:
             st.balloons()
+
         elif mystate.myscore <= 0:
             st.snow()
 
         tm.sleep(5)
+
         mystate.runpage = Main
         st.rerun()
 
-
 def Main():
-    st.markdown('<style>[data-testid="stSidebar"] > div:first-child {width: 310px;}</style>',
-                unsafe_allow_html=True, )  # reduce sidebar width
+    st.markdown('<style>[data-testid="stSidebar"] > div:first-child {width: 310px;}</style>', unsafe_allow_html=True, )  # reduce sidebar width
     st.markdown(purple_btn_colour, unsafe_allow_html=True)
 
     InitialPage()
     with st.sidebar:
-        mystate.GameDetails[0] = st.radio('Difficulty Level:', options=('Easy', 'Medium', 'Hard'), index=1,
-                                          horizontal=True, )
-        mystate.GameDetails[3] = st.text_input("Player Name, Country", placeholder='Shawn Pereira, India',
-                                               help='Optional input only for Leaderboard')
+        mystate.GameDetails[0] = st.radio('Difficulty Level:', options=('Easy', 'Medium', 'Hard'), index=1, horizontal=True, )
+        mystate.GameDetails[3] = st.text_input("Player Name, Country", placeholder='Shawn Pereira, India', help='Optional input only for Leaderboard')
 
         if st.button(f"🕹️ New Game", use_container_width=True):
-
             if mystate.GameDetails[0] == 'Easy':
                 mystate.GameDetails[1] = 8  # secs interval
                 mystate.GameDetails[2] = 6  # total_cells_per_row_or_col
@@ -432,7 +430,6 @@ def Main():
             st.rerun()
 
         st.markdown(horizontal_bar, True)
-
 
 if 'runpage' not in mystate: mystate.runpage = Main
 mystate.runpage()

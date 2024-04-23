@@ -173,7 +173,8 @@ def ResetBoard():
         if mystate.plyrbtns[vcell]['isPressed'] == False:
             vemoji = mystate.emoji_bank[rndm_no]
             mystate.plyrbtns[vcell]['eMoji'] = vemoji
-            if vemoji == mystate.sidebar_emoji: sidebar_emoji_in_list = True
+            if vemoji == mystate.sidebar_emoji:
+                sidebar_emoji_in_list = True
 
     if sidebar_emoji_in_list == False:  # sidebar pix is not on any button; add pix randomly
         tlst = [x for x in range(1, ((total_cells_per_row_or_col ** 2)+1))]
@@ -216,7 +217,8 @@ def PreNewGame():
         mystate.emoji_bank = locals()[wch_bank]
 
     mystate.plyrbtns = {}
-    for vcell in range(1, ((total_cells_per_row_or_col ** 2)+1)): mystate.plyrbtns[vcell] = {'isPressed': False, 'isTrueFalse': False, 'eMoji': ''}
+    for vcell in range(1, ((total_cells_per_row_or_col ** 2)+1)):
+        mystate.plyrbtns[vcell] = {'isPressed': False, 'isTrueFalse': False, 'eMoji': ''}
 
 def ScoreEmoji():
     if mystate.myscore == 0: return '😐'

@@ -53,8 +53,7 @@ if "myscore" not in mystate: mystate.myscore = 0
 if "plyrbtns" not in mystate: mystate.plyrbtns = {}
 if "sidebar_emoji" not in mystate: mystate.sidebar_emoji = ''
 if "emoji_bank" not in mystate: mystate.emoji_bank = []
-if "GameDetails" not in mystate: mystate.GameDetails = ['Medium', 6, 7,
-                                                        '']  # difficulty level, sec interval for autogen, total_cells_per_row_or_col, player name
+if "GameDetails" not in mystate: mystate.GameDetails = ['Medium', 6, 7, '']  # difficulty level, sec interval for autogen, total_cells_per_row_or_col, player name
 
 
 # common functions
@@ -87,10 +86,8 @@ def Leaderboard(what_to_do):
                 leaderboard = json.load(open(vpth + 'leaderboard.json'))  # read file
                 leaderboard_dict_lngth = len(leaderboard)
 
-                leaderboard[str(leaderboard_dict_lngth + 1)] = {'NameCountry': mystate.GameDetails[3],
-                                                                'HighestScore': mystate.myscore}
-                leaderboard = dict(
-                    sorted(leaderboard.items(), key=lambda item: item[1]['HighestScore'], reverse=True))  # sort desc
+                leaderboard[str(leaderboard_dict_lngth + 1)] = {'NameCountry': mystate.GameDetails[3], 'HighestScore': mystate.myscore}
+                leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1]['HighestScore'], reverse=True))  # sort desc
 
                 if len(leaderboard) > 3:
                     for i in range(len(leaderboard) - 3): leaderboard.popitem()  # rmv last kdict ey
@@ -102,9 +99,7 @@ def Leaderboard(what_to_do):
             if os.path.isfile(vpth + 'leaderboard.json'):
                 leaderboard = json.load(open(vpth + 'leaderboard.json'))  # read file
 
-                leaderboard = dict(
-                    sorted(leaderboard.items(), key=lambda item: item[1]['HighestScore'], reverse=True))  # sort desc
-
+                leaderboard = dict(sorted(leaderboard.items(), key=lambda item: item[1]['HighestScore'], reverse=True))  # sort desc
                 sc0, sc1, sc2, sc3 = st.columns((2, 3, 3, 3))
                 rknt = 0
                 for vkey in leaderboard.keys():
